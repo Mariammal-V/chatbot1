@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Support Chatbot</h1>
+        <form id="chat-form">
+            <textarea id="query" rows="4" placeholder="Ask a question..."></textarea>
+            <button type="submit">Send</button>
+        </form>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const userQuery = document.getElementById("query").value;
+            const responseDiv = document.getElementById("response");
+
+            fetch('/chat', {
+                method: 'POST',
+                body: new FormData(document.getElementById("chat-form")),
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseDiv.innerHTML = `
+                    <h3>User Query:</h3><p>${userQuery}</p>
+                    <h3>Intent:</h3><p>${data.intent}</p>
+                    <h3>Entities:</h3><p>${JSON.stringify(data.entities)}</p>
+                    <h3>Response:</h3><p>${data.response}</p>
+                `;
+            })
+            .catch(error => {
+                responseDiv.innerHTML = "<p>Error: " + error.message + "</p>";
+            });
+        });
+    </script>
+</body>
+</html>
